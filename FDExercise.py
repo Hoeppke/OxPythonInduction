@@ -33,12 +33,13 @@ def exercise1(N=2**10):
 
 def exercise1Firedrake(N=2**6):
     # Constuct Mesh
+    #not sure what this package is, looks like finite elements
     mesh = fd.IntervalMesh(N, 1)
     V = fd.FunctionSpace(mesh, "CG", 1)
     u = fd.TrialFunction(V)
     v = fd.TestFunction(V)
     f = fd.Function(V)
-
+    
     a = fd.inner(fd.grad(u), fd.grad(v)) * fd.dx
     # x = fd.SpatialCoordinate(mesh)
 
