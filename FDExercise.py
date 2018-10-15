@@ -2,7 +2,6 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as la
 import matplotlib.pyplot as plt
-import firedrake as fd
 
 
 def construct3PointStar(N, h):
@@ -16,7 +15,7 @@ def construct3PointStar(N, h):
     return A
 
 
-def exercise1(N = 2**10):
+def exercise1(N=2**10):
     # Solve the problem u''(x) = 10 sin(20 *x) + cos(x^5)
     # Construct the discrete space:
     X = np.linspace(0, 1, num = N)
@@ -35,16 +34,23 @@ def exercise1(N = 2**10):
 def exercise1Firedrake(N=2**6):
     # Constuct Mesh
     mesh = fd.IntervalMesh(N, 1)
-    V = fd.FunctionSpace(mesh, "Lagrange", 1)
-    print(V)
+    V = fd.FunctionSpace(mesh, "CG", 1)
     u = fd.TrialFunction(V)
     v = fd.TestFunction(V)
     f = fd.Function(V)
 
+    a = fd.inner(fd.grad(u), fd.grad(v)) * fd.dx
+    # x = fd.SpatialCoordinate(mesh)
+
+    bc1 = fd.DirichletBC(V, fd.Constant(2.0), 1)
+    f.interpolate(fd.Constant(10)*fd.pi)
+    L = f * v * fd.dx
+    fd.solve(a == L, u, bcs=bc1, solver_parameters={"ksp_type": "preonly", "pc_type": "lu"})
+
 
 def main():
-    # exercise1()
-    exercise1Firedrake()
+    exercise1()
+    # exercise1Firedrake()
 
 if __name__ == "__main__":
     main()
